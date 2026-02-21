@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Mariage Georges & Yara</title>
+<!-- Google Fonts: Great Vibes for names -->
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+/* ===== Global Styles ===== */
+html, body {
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  font-family: Arial, sans-serif;
+  overflow-x:hidden;
+  scroll-behavior: smooth;
+  background-color:#fff7ee;
+}
+
+/* ===== FIRST PAGE: FULL SCREEN ENVELOPE ===== */
+.landing {
+  position: relative;
+  width:100%;
+  height:100vh;
+  background-image: url('envelope.jpg'); /* Your photo in repo root */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Seal clickable overlay */
+.seal-overlay {
+  position: absolute;
+  bottom: 15%; /* adjust to seal location */
+  left:50%;
+  transform: translateX(-50%);
+  width:80px;
+  height:80px;
+  cursor:pointer;
+  border-radius:50%;
+  background-color: rgba(255,255,255,0.2); /* semi-transparent overlay */
+  transition: transform 0.2s ease;
+}
+.seal-overlay:hover {
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* ===== SECOND PAGE: RSVP ===== */
+#rsvp-section {
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+h1.rsvp-names {
+  font-family: 'Great Vibes', cursive;
+  font-size:14vw;
+  color:#74583e;
+  margin:10px 0;
+}
+
+#message, #guest-name, #num-guests, p.instruction {
+  font-size:6vw;
+  color:#74583e;
+  margin:5px 0;
+  line-height:1.2;
+}
+
+div.rsvp-buttons {
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-top:5px;
+}
+
+button.confirm, button.decline {
+  font-size:4vw;
+  padding:10px 25px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  min-width:80px;
+  max-width:120px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.2);
+  background: linear-gradient(90deg, #c8a96a, #b8860b); /* gold buttons */
+  color:white;
+  transition: all 0.2s ease;
+}
+button.confirm:hover, button.decline:hover { transform: scale(1.05); }
+
+textarea {
+  width:90%;
+  max-width:400px;
+  height:120px;
+  padding:15px;
+  font-size:5vw;
+  border-radius:15px;
+  border:none;
+  background-color:#fff3f0;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  resize:none;
+  margin-top:5px;
+}
+
+button#submit {
+  font-size:5vw;
+  padding:15px 40px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+  width:70%;
+  max-width:300px;
+  color:white;
+  background:#74583e; /* same as names color */
+  box-shadow:0 6px 20px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+button#submit:hover {
+  transform: scale(1.05);
+  background:#5c4631;
+}
+
+/* ===== Mobile Tweaks ===== */
+@media (max-width:480px){
+  h1.rsvp-names { font-size:16vw; }
+  #message,#guest-name,#num-guests,p.instruction { font-size:7vw; }
+  button.confirm,button.decline,button#submit { font-size:5vw; }
+  textarea{ font-size:5vw; height:90px; width:95%; }
+  .seal-overlay{width:60px;height:60px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== FIRST PAGE ===== -->
+<div class="landing">
+  <div class="seal-overlay" onclick="openRSVP()"></div>
+</div>
+
+<!-- ===== SECOND PAGE: RSVP ===== -->
+<div class="container" id="rsvp-section">
+  <h1 class="rsvp-names">Georges & Yara</h1>
+  <div id="message"></div>
+
+  <p class="instruction">Honor us with your presence</p>
+  <p id="guest-name"></p>
+  <p class="instruction">Please reply before June 7, 2026</p>
+  <p class="instruction">Number of persons invited: <span id="num-guests"></span></p>
+
+  <p class="instruction">Are you attending:</p>
+  <div class="rsvp-buttons">
+    <button class="confirm" onclick="selectAttendance(true)">Yes</button>
+    <button class="decline" onclick="selectAttendance(false)">No</button>
+  </div>
+
+  <p class="instruction">Share your love and wishes:</p>
+  <textarea id="love-message" placeholder="Write your message here..."></textarea>
+
+  <button id="submit" onclick="submitForm()">Submit</button>
+</div>
+
+<script>
+// ===== Scroll to RSVP on click =====
+function openRSVP(){
+  document.querySelector('.landing').style.opacity=0;
+  setTimeout(()=>{document.querySelector('.landing').style.display='none';},700);
+  document.getElementById('rsvp-section').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== URL Parameters =====
+const params=new URLSearchParams(window.location.search);
+const name=params.get("name");
+const guests=params.get("guests");
+if(name && guests){
+  document.getElementById("message").innerHTML="Dear <b>"+name+"</b>,";
+  document.getElementById("guest-name").innerText=name;
+  document.getElementById("num-guests").innerText=guests;
+}
+
+// ===== RSVP Selection =====
+let attending=null;
+function selectAttendance(choice){
+  attending=choice;
+  const buttons=document.querySelectorAll('.rsvp-buttons button');
+  buttons.forEach(btn=>btn.style.opacity='0.6');
+  if(choice){ document.querySelector('button.confirm').style.opacity='1'; }
+  else{ document.querySelector('button.decline').style.opacity='1'; }
+}
+
+// ===== Submit Form =====
+function submitForm(){
+  const loveMsg=document.getElementById("love-message").value;
+  if(attending===null){ alert("Please select Yes or No for attendance"); return; }
+  alert("Submitted!\nAttending: "+(attending?"Yes":"No")+"\nMessage: "+loveMsg);
+}
+</script>
+
+</body>
+</html>
